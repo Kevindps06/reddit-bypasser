@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "ng-hcaptcha": "^1.1.0",
     "promise-poller": "^1.9.1",
     "puppeteer": "^10.1.0",
     "request": "^2.88.2",

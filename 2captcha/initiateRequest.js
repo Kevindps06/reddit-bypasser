@@ -2,10 +2,10 @@ const request = require("request-promise-native");
 
 async function initiateRequest(captchaApiKey) {
   const formData = {
-    method: "userrecaptcha",
-    googlekey: "6LeTnxkTAAAAAN9QEuDZRpn90WwKk_R1TRW_g-JC",
     key: captchaApiKey,
-    pageUrl: "https://old.reddit.com/login",
+    method: "userrecaptcha",
+    googlekey: "6Lf9Tz8aAAAAAF2SwORDM_AaaUTPyP885ri8xP70",
+    pageUrl: "https://registrovacunacovid.mspas.gob.gt/mspas/citas/consulta",
     json: 1,
   };
   try {

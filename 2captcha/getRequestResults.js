@@ -1,4 +1,5 @@
 const poll = require("promise-poller").default;
+const request = require("request-promise-native");
 
 function requestCaptchaResults(apiKey, requestId) {
   const url = `http://2captcha.com/res.php?key=${apiKey}&action=get&id=${requestId}&json=1`;
@@ -15,7 +16,7 @@ function requestCaptchaResults(apiKey, requestId) {
 
 const timeout = (millis) => new Promise((resolve) => setTimeout(resolve, millis));
 
-async function requestResults(key, id, retries = 30, interval = 1500, delay = 15000) {
+async function requestResults(key, id, retries = 100, interval = 5000, delay = 30000) {
   try {
     await timeout(delay);
     return poll({
