@@ -1,18 +1,25 @@
-const request = require("request-promise-native");
+const axios = require("axios");
 
 async function initiateRequest(captchaApiKey) {
-  const formData = {
-    key: captchaApiKey,
-    method: "userrecaptcha",
-    googlekey: "6Lf9Tz8aAAAAAF2SwORDM_AaaUTPyP885ri8xP70",
-    pageUrl: "https://registrovacunacovid.mspas.gob.gt/mspas/citas/consulta",
-    json: 1,
-  };
-  try {
-    const response = await request.post("http://2captcha.com/in.php", { form: formData });
-    return JSON.parse(response).request;
-  } catch (error) {
-    console.log(error);
+  while (true) {
+    try {
+      const formData = {
+        key: captchaApiKey,
+        method: "userrecaptcha",
+        googlekey: "6Lf9Tz8aAAAAAF2SwORDM_AaaUTPyP885ri8xP70",
+        pageurl:
+          "https://registrovacunacovid.mspas.gob.gt/mspas/citas/consulta",
+        json: 1,
+      };
+
+      const response = await axios.get("http://2captcha.com/in.php", {
+        params: formData,
+      });
+
+      return response.data.request;
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
 
