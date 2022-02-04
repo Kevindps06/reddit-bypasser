@@ -17,7 +17,7 @@ const args = [];
 (async () => {
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency: 5,
+    maxConcurrency: 6,
     timeout: 2147483647,
     puppeteerOptions: {
       args: args,
