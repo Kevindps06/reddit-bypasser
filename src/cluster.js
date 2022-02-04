@@ -12,9 +12,13 @@ const input = require("../input.json");
 const result = fs.existsSync("../result.json") ? require("../result.json") : [];
 const apiKey = require("../2captcha/apiKey");
 
-const args = [];
+const args = ["--no-sandbox", "--disable-setuid-sandbox"];
 
 (async () => {
+  if (!fs.existsSync("../.cache")) {
+    fs.mkdirSync("../.cache");
+  }
+
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency: 6,
@@ -123,7 +127,7 @@ const args = [];
         pushIntoResult(
           data.input,
           response.individual.nombre_completo,
-          response.individual.telefono
+          response.individual.telefono.toString()
         );
         console.log("Result files generated.");
 
