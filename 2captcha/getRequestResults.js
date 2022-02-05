@@ -9,7 +9,7 @@ function requestCaptchaResults(apiKey, requestId) {
         try {
           const rawResponse = await axios.get(url);
           const resp = rawResponse.data;
-          console.log(resp.request); // this consoles out 'CAPTCHA_NOT_READY' until it is ready
+          //console.log(resp.request); // this consoles out 'CAPTCHA_NOT_READY' until it is ready
           if (resp.status === 0) {
             return reject(resp.request);
           }
@@ -29,7 +29,7 @@ const timeout = (millis) =>
 async function requestResults(
   key,
   id,
-  retries = 100,
+  retries = 50,
   interval = 5000,
   delay = 30000
 ) {

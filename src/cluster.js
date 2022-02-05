@@ -21,7 +21,7 @@ const args = ["--no-sandbox", "--disable-setuid-sandbox"];
 
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency: 6,
+    maxConcurrency: 2,
     timeout: 2147483647,
     puppeteerOptions: {
       args: args,
@@ -29,6 +29,7 @@ const args = ["--no-sandbox", "--disable-setuid-sandbox"];
       defaultViewport: false,
       userDataDir: "../.cache",
     },
+    monitor: true,
   });
 
   cluster.on("taskerror", (err, data) => {
@@ -36,6 +37,8 @@ const args = ["--no-sandbox", "--disable-setuid-sandbox"];
   });
 
   await cluster.task(async ({ page, data }) => {
+    const start = Date.now();
+
     let response;
 
     page.on("response", async (res) => {
@@ -50,11 +53,11 @@ const args = ["--no-sandbox", "--disable-setuid-sandbox"];
 
     while (true) {
       try {
-        console.log("Loading page...");
+        //console.log("Loading page...");
         await page.goto(data.url);
-        console.log("Page loading finished.");
+        //console.log("Page loading finished.");
 
-        console.log("Inputing data...");
+        //console.log("Inputing data...");
         await page.type(
           "input[placeholder='CUI (DPI) / Pasaporte']",
           data.input.DPI
@@ -64,9 +67,9 @@ const args = ["--no-sandbox", "--disable-setuid-sandbox"];
           "input[name=mydate]",
           data.input["Fecha de Nacimiento"]
         );
-        console.log("Data input finished.");
+        //console.log("Data input finished.");
 
-        console.log("Solving captcha...");
+        //console.log("Solving captcha...");
         const captchaResponse = await getRequestResults(
           apiKey,
           await initiateRequest(apiKey)
@@ -79,11 +82,11 @@ const args = ["--no-sandbox", "--disable-setuid-sandbox"];
         await page.evaluate(
           `___grecaptcha_cfg.clients[0].o.o.callback("${captchaResponse}");`
         );
-        console.log("Captcha solved.");
+        //console.log("Captcha solved.");
 
         await page.click("button[type=submit]");
 
-        console.log("Waiting web response...");
+        //console.log("Waiting web response...");
         let waitingWebResponseSeconds = 0;
         do {
           await util.promisify(setTimeout)(1000);
@@ -106,36 +109,38 @@ const args = ["--no-sandbox", "--disable-setuid-sandbox"];
         await util.promisify(setTimeout)(1000);
 
         if ((await page.$("div.swal2-popup")) !== null) {
-          console.log("Web response error.");
+          //console.log("Web response error.");
 
-          console.log("Generating result files...");
+          //console.log("Generating result files...");
           pushIntoResult(data.input, "No encontrado", "No encontrado");
-          console.log("Result files generated.");
+          //console.log("Result files generated.");
 
           break;
         }
 
-        console.log("Web response successful.");
+        //console.log("Web response successful.");
 
-        console.log("Getting data response...");
+        //console.log("Getting data response...");
         do {
           await util.promisify(setTimeout)(1000);
         } while (!response);
-        console.log("Data response getted.");
+        //console.log("Data response getted.");
 
-        console.log("Generating result files...");
+        //console.log("Generating result files...");
         pushIntoResult(
           data.input,
           response.individual.nombre_completo,
           response.individual.telefono.toString()
         );
-        console.log("Result files generated.");
+        //console.log("Result files generated.");
 
         break;
       } catch (err) {
         console.log(`Process error, retrying... ${err}`);
       }
     }
+
+    console.log(`Took ${Date.now() - start} ms`);
   });
 
   for (let i = 0; input.length > i; i++) {
@@ -185,6 +190,9 @@ function pushIntoResult(data, nombre, telefono) {
   });
   wb.write("../result.xlsx");
 
-  /*input.splice(0, 1);
-  fs.writeFileSync("../input.json", JSON.stringify(input));*/
+  const index = input.indexOf((input) => input.DPI === data.DPI);
+  if (index > -1) {
+    input.splice(index, 1);
+  }
+  fs.writeFileSync("../input.json", JSON.stringify(input));
 }
