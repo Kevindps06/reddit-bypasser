@@ -1,3 +1,5 @@
+const os = require("os");
+const cpuCount = os.cpus().length;
 const { Cluster } = require("puppeteer-cluster");
 const util = require("util");
 const fs = require("fs");
@@ -21,7 +23,7 @@ const args = ["--no-sandbox", "--disable-setuid-sandbox"];
 
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency: 2,
+    maxConcurrency: cpuCount * 8,
     timeout: 2147483647,
     puppeteerOptions: {
       args: args,
@@ -136,7 +138,8 @@ const args = ["--no-sandbox", "--disable-setuid-sandbox"];
 
         break;
       } catch (err) {
-        console.log(`Process error, retrying... ${err}`);
+        console.log(`Process error, retrying in 30s... ${err}`);
+        await util.promisify(setTimeout)(30000);
       }
     }
 
