@@ -193,9 +193,9 @@ function pushIntoResult(data, nombre, telefono) {
   });
   wb.write("../result.xlsx");
 
-  const index = input.indexOf((input) => input.DPI === data.DPI);
-  if (index > -1) {
-    input.splice(index, 1);
-  }
+  input.splice(
+    input.findIndex((input) => input.DPI === data.DPI),
+    1
+  );
   fs.writeFileSync("../input.json", JSON.stringify(input));
 }
